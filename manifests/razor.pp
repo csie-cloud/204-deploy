@@ -13,10 +13,6 @@ class creator::razor{
     provider => 'rpm'
   }
 
-  notify{ 'tmp':
-    message => "password: ${::password::keystone_db}"
-  }
-  
   class { 'razor':
     require => Package['puppetlabs-release'],
     database_hostname         => '127.0.0.1',
