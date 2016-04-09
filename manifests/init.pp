@@ -1,9 +1,12 @@
-class creator{
-  $domain_name = "cloudy.csie.ntu.edu.tw"
-  include ::password
-  include ::creator::razor   
-  include ::creator::dns
-  class{ '::creator::dhcp':
+class deploy{
+  $domain_name = "204.csie.ntu.edu.tw"
+  include ::deploy::razor   
+  
+  class{ '::deploy::dns':
+    domain_name => $domain_name
+  }
+
+  class{ '::deploy::dhcp':
     domain_name => $domain_name
   }
 }

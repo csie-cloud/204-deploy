@@ -1,0 +1,24 @@
+$ORIGIN .
+$TTL 86400	; 1 day
+<%= $domain_name %>.	IN SOA	dns.<%= $domain_name %>. <%= $domain_name %>. (
+				2016040901 ; serial
+				21600
+                ; refresh (6 hours)
+				3600       ; retry (1 hour)
+				604800     ; expire (1 week)
+				86400      ; minimum (1 day)
+				)
+			NS	dns.cloud.csie.ntu.edu.tw.
+$ORIGIN cloud.csie.ntu.edu.tw.
+;
+$TTL 86400	; 1 day
+;
+; Creator
+;
+dns                 IN A	<%= $ip_prefix%>.252
+deploy              IN A	<%= $ip_prefix%>.252
+
+hadoop1 IN A <%= $ip_prefix%>.101
+hadoop2 IN A <%= $ip_prefix%>.102
+hadoop2 IN A <%= $ip_prefix%>.103
+

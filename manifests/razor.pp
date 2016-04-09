@@ -1,4 +1,4 @@
-class creator::razor{
+class deploy::razor{
   class { '::postgresql::server': }
   
   class { '::tftp':
@@ -16,7 +16,7 @@ class creator::razor{
   class { 'razor':
     require => Package['puppetlabs-release'],
     database_hostname         => '127.0.0.1',
-    database_password         => $::password::razor_db,
+    database_password         => 'ZLpHVqLSMGyUR7/uSXNelOGFFHEct8EwMizZc7Cqk98=',
     compile_microkernel => false,
     enable_db => true,
     server_http_port => '8150',

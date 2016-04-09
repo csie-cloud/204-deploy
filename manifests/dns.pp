@@ -1,50 +1,54 @@
-class creator::dns{
-  $domain_name = 'cloudy.csie.ntu.edu.tw'
-  include dns::server
+class deploy::dns( $domain_name ){
+  
+  include bind
+  
+  bind::server::conf { '/etc/named.conf':
+    listen_on_addr => ['127.0.0.1'],
+    forwarders => [ '140.112.30.21', '8.8.8.8' ],
+    allow_query => ['localnets'],
+    views => {
+      'hadoop' => {
+        'match-clients' => [ '10.10.0.0/24' ],
+        'zones' => {
+          "${domain_name}" => [
+            'type master',
+            'file "hadoop.zone"'
+          ]
+        }
+      },
+      'ceph' => {
+        'match-clients' => [ '10.20.0.0/24' ],
+        'zones' => {
+          "${domain_name}" => [
+            'type master',
+            'file "ceph.zone"'
+          ]
+        }
+      },
+      'hadoop' => {
+        'match-clients' => [ '127.0.0.1/32' ],
+        'zones' => {
+          "${domain_name}" => [
+            'type master',
+            'file "hadoop.zone"'
+          ]
+        }
+      },
 
-  dns::server::options { '/etc/named/named.conf.options':
-    listen_on => ['127.0.0.1'],
-    forwarders => [ '140.112.30.21', '8.8.8.8' ]
+    }
+  }
+
+  bind::server::file { 'hadoop.zone':
+    content => epp('deploy/hadoop.zone.epp',
+    { 'domain_name' => "hadoop.${domain_name}", 'ip_prefix' => '10.2.0' } )
+  }
+
+  bind::server::file { 'ceph.zone':
+    content => epp('deploy/ceph.zone.epp',
+    { 'domain_name' => "ceph.${domain_name}", 'ip_prefix' => '10.1.0' } )
   }
   
-  dns::zone { $domain_name:
-    soa => "na.${domain_name}",
-    nameservers => ['ns'],
-  }
+  Bind::Server::File { zonedir => '/var/named' }
   
-  dns::zone { '217.168.192.IN-ADDR.ARPA':
-    soa => "ns.${domain_name}",
-    nameservers => ['ns'],
-  }
-
-  dns::record::ns {
-    "${domain_name}":
-      zone => $domain_name,
-      data => 'ns'
-  }
-  
-  dns::record::a {
-    'creator':
-      zone => $domain_name,
-      data => ['192.168.217.254'],
-      ptr => true;
-    'controller1':
-      zone => $domain_name,
-      data => ['192.168.217.241'],
-      ptr => true;
-    'compute1':
-      zone => $domain_name,
-      data => ['192.168.217.201'],
-      ptr => true;
-  }
-
-  dns::record::cname {
-    'controller':
-      zone => $domain_name,
-      data => "controller1.${dmain_name}";
-    'storage':
-      zone => $domain_name,
-      data => "storage1.${dmain_name}";
-  }
   
 }
